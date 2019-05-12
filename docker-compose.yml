@@ -1,0 +1,125 @@
+version: '3'
+services:
+  iot:
+    image: marcelodock/akkawsnarm32v7
+    ports:
+      - "2540:2540"
+    environment:
+      CLUSTER_IP: iot
+      CLUSTER_PORT: 2540
+      SEED1_IP: iot
+      SEED1_PORT: 2540
+      MASTER_SYSTEM_NAME: MasterSystem
+      MASTER_IP: master
+      MASTER_PORT: 2550
+      MQTT_IP: mqttbroker
+      MQTT_PORT: 1883
+      CASSANDRA_SEED: cass
+      #      SEED2_TCP_ADDR: seed2
+      ROLE: iot
+    networks:
+      - akka-wsn
+    deploy:
+      replicas: 1
+      placement:
+        constraints: [node.role == worker]
+    command: gradle run --args="iot 5"
+
+  worker1:
+    image: akkawsn
+    ports:
+      - "2560:2560" # Akka port
+      - "8558:8558" # Http Management port
+    environment:
+      CLUSTER_IP: worker1
+      CLUSTER_PORT: 2560
+      SEED1_IP: worker1
+      SEED1_PORT: 2560
+      MASTER_SYSTEM_NAME: MasterSystem
+      MASTER_IP: master
+      MASTER_PORT: 2550
+      #      SEED2_TCP_ADDR: seed2
+      CASSANDRA_SEED: cass
+      ROLE: worker
+    networks:
+      - akka-wsn
+    deploy:
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+      restart_policy:
+        condition: any
+        delay: 10s
+    command: gradle run --args="worker"
+
+  mqttbroker:
+    image: arm32v6/eclipse-mosquitto
+#    image: eclipse-mosquitto
+    ports:
+      - "1883:1883" # Listen port
+      - "9001:9001" # Websocket port
+    deploy:
+      replicas: 1
+      placement:
+        constraints: [node.role == worker]
+    networks:
+      - akka-wsn
+
+  cass:
+    image: cassandra
+    #    volumes:
+    #      - /home/spectre/cassFolder
+    environment:
+      CASSANDRA_CLUSTER_NAME: CassandraCluster
+    #      CASSANDRA_LISTEN_ADDRESS: cass
+    #      CASSANDRA_BROADCAST_ADDRESS: cass
+    #      CASSANDRA_RPC_ADDRESS: cass
+    #      CASSANDRA_SEEDS: cass
+    #      CASSANDRA_ENDPOINT_SNITCH: GossipingPropertyFileSnitch
+    #      CLUSTER_IP: cass
+    #      CLUSTER_PORT: 2560
+    #      SEED1_TCP_ADDR: seed1
+    #      SEED2_TCP_ADDR: seed2
+    #      ROLE: backend
+    networks:
+      - akka-wsn
+    deploy:
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+      restart_policy:
+        condition: any
+        delay: 10s
+
+  master:
+    image: marcelodock/akkawsn
+    ports:
+      - "2550:2550"
+    environment:
+      CLUSTER_IP: master
+      CLUSTER_PORT: 2550
+      SEED1_IP: master
+      SEED1_PORT: 2550
+      MASTER_SYSTEM_NAME: MasterSystem
+      CASSANDRA_SEED: cass
+      #      SEED2_TCP_ADDR: seed2
+      ROLE: master
+    networks:
+      - akka-wsn
+    deploy:
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+      restart_policy:
+        condition: any
+        delay: 20s
+      update_config:
+        parallelism: 1
+        delay: 10s
+    command: gradle run --args="master"
+
+networks:
+  akka-wsn:
+
+#volumes:
+#  data:
