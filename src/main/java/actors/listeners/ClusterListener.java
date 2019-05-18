@@ -1,4 +1,4 @@
-package actors;
+package actors.listeners;
 
 import akka.actor.AbstractActor;
 import akka.cluster.Cluster;

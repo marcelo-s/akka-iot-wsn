@@ -1,6 +1,6 @@
 package main;
 
-import actors.ClusterListener;
+import actors.listeners.ClusterListener;
 import actors.master.Master;
 import actors.master.ResultProcessor;
 import akka.actor.ActorSystem;

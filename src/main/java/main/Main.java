@@ -14,7 +14,7 @@ public class Main {
                 break;
             }
             case "worker": {
-                MainWorkerSystem.main(new String[]{});
+                MainWorker.main(new String[]{});
                 break;
             }
         }

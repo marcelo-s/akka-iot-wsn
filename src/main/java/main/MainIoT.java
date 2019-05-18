@@ -1,6 +1,6 @@
 package main;
 
-import actors.ClusterListener;
+import actors.listeners.ClusterListener;
 import actors.iot.IoTManager;
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;

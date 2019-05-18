@@ -1,6 +1,6 @@
 package main;
 
-import actors.ClusterListener;
+import actors.listeners.ClusterListener;
 import actors.worker.WorkerRegion;
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
@@ -10,7 +10,7 @@ import akka.cluster.client.ClusterClientSettings;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 
-public class MainWorkerSystem {
+public class MainWorker {
 
     public static void main(String[] args) {
 
